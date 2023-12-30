@@ -1,0 +1,1 @@
+source "$BR2_EXTERNAL_app_external_PATH/package/sensors/Config.in"
