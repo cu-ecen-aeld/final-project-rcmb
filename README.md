@@ -1,4 +1,4 @@
-# Project Name
+# Fermentation Tank Monitor
 
 Project to implement a monitoring solution for a fermentation tank.
 
