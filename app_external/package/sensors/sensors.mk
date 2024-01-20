@@ -13,7 +13,7 @@ define SENSORS_BUILD_CMDS
     endef
 
 define SENSORS_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 0755 $(@D)/custom  $(TARGET_DIR)/usr/bin
+    $(INSTALL) -D -m 0755 $(@D)/sensor_test  $(TARGET_DIR)/usr/bin
     endef
 
 $(eval $(generic-package))

@@ -1,13 +1,14 @@
 CC ?= gcc
-CFLAGS = -Wall -Wextra -li2c
+CFLAGS = -Wall -Wextra 
 
-SRC_FILES = test.c 
+SRC_FILES = sensor_test.c 
 
-.PHONY: custom clean
+.PHONY: sensor_test clean
 
-custom: $(SRC_FILES)
-		$(CC) $(CFLAGS) -o $@ $^
+sensor_test: $(SRC_FILES)
+		$(CC) $(CFLAGS) -o $@ $^ -li2c
 
 clean:
-		-rm -f custom
+		-rm -f sensor_test
+
 

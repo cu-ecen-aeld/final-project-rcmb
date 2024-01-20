@@ -3,7 +3,7 @@
 # You should override this file using BR2_PACKAGE_RPI_FIRMWARE_CONFIG_FILE.
 # See http://buildroot.org/manual.html#rootfs-custom
 # and http://elinux.org/RPiconfig for a description of config.txt syntax
-
+dtparam=i2c_arm=on
 start_file=start.elf
 fixup_file=fixup.dat
 
