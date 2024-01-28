@@ -1,14 +1,22 @@
 CC ?= gcc
 CFLAGS = -Wall -Wextra 
+I2CFLAGS = -li2c
 
-SRC_FILES = sensor_test.c 
+SERVER_SRC_FILES = sensor_server.c cJSON.c 
+SENSOR_SRC_FILES = sensor_test.c
 
-.PHONY: sensor_test clean
+.PHONY: all sensor_server sensor_test clean
 
-sensor_test: $(SRC_FILES)
-		$(CC) $(CFLAGS) -o $@ $^ -li2c
+all: sensor_server sensor_test
+
+sensor_server: $(SERVER_SRC_FILES)
+		$(CC) $(CFLAGS) -o $@ $^ 
+
+sensor_test: $(SENSOR_SRC_FILES)
+		$(CC) $(CFLAGS) -o $@ $^ $(I2CFLAGS)
 
 clean:
-		-rm -f sensor_test
+		-rm -f sensor_server sensor_test
+
 
 
