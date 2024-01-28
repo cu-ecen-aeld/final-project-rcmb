@@ -22,13 +22,13 @@ Project to implement a monitoring solution for a fermentation tank.
 
 3.To customize
 
-`cd [repository-directory]\buildroot`
+`cd [repository-directory]\buildroot`\
 `make menuconfig`
 
 4.To save the config and build
 
-`cd..`
-`./save-config.sh`
+`cd..`\
+`./save-config.sh`\
 `./build.sh`
 
 ## Usage
