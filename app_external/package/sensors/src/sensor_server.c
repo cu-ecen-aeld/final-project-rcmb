@@ -11,13 +11,19 @@
 #include <time.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <math.h>
+
+#include "sensor_fx.h"
 
 #define PORT 8080
 #define MAX_CLIENTS 5
 #define SENSOR_PIN 0
 
+int fd;
+
 void signalHandler(int signal) {
     syslog(LOG_INFO, "Received signal: %d. Shutting down server.", signal);
+    closeI2CDevice(fd);
     exit(EXIT_SUCCESS);
 }
 
@@ -52,9 +58,11 @@ void daemonize() {
 }
 
 void readSensorData(float *temperature, float *pressure) {
-    // Simulated values
-    *temperature = 25.5;
-    *pressure = 1013.25;
+    // sensor values
+    syslog(LOG_INFO, "I2C File Descriptor : %i", fd);
+    
+    *temperature = getTemperatureReading(fd);
+    *pressure    = getPressureReading(fd);
 }
 
 void *handleClient(void *arg) {
@@ -80,8 +88,8 @@ void *handleClient(void *arg) {
 
         cJSON *jsonObject = cJSON_CreateObject();
         cJSON_AddStringToObject(jsonObject, "time", formattedTime);
-        cJSON_AddNumberToObject(jsonObject, "temperature", temperature);
-        cJSON_AddNumberToObject(jsonObject, "pressure", pressure);
+        cJSON_AddNumberWithPrecisionToObject(jsonObject, "temperature", temperature,2);
+        cJSON_AddNumberWithPrecisionToObject(jsonObject, "pressure", pressure,2);
 
         char *jsonStr = cJSON_Print(jsonObject);
 
@@ -122,6 +130,8 @@ int main() {
     signal(SIGINT, signalHandler);
 
     syslog(LOG_INFO, "Sensor server starting...");
+
+    fd = openI2CDevice();
 
     daemonize();
 

@@ -81,7 +81,7 @@ then using the CJSON_API_VISIBILITY flag to "export" the same symbols the way CJ
 /* project version */
 #define CJSON_VERSION_MAJOR 1
 #define CJSON_VERSION_MINOR 7
-#define CJSON_VERSION_PATCH 17
+#define CJSON_VERSION_PATCH 15
 
 #include <stddef.h>
 
@@ -117,6 +117,8 @@ typedef struct cJSON
     int valueint;
     /* The item's number, if type==cJSON_Number */
     double valuedouble;
+    /* Decimal places */
+    int decimal_places;
 
     /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
     char *string;
@@ -266,6 +268,7 @@ CJSON_PUBLIC(cJSON*) cJSON_AddTrueToObject(cJSON * const object, const char * co
 CJSON_PUBLIC(cJSON*) cJSON_AddFalseToObject(cJSON * const object, const char * const name);
 CJSON_PUBLIC(cJSON*) cJSON_AddBoolToObject(cJSON * const object, const char * const name, const cJSON_bool boolean);
 CJSON_PUBLIC(cJSON*) cJSON_AddNumberToObject(cJSON * const object, const char * const name, const double number);
+CJSON_PUBLIC(cJSON*) cJSON_AddNumberWithPrecisionToObject(cJSON * const object, const char * const name, const double n, int decimal_places);
 CJSON_PUBLIC(cJSON*) cJSON_AddStringToObject(cJSON * const object, const char * const name, const char * const string);
 CJSON_PUBLIC(cJSON*) cJSON_AddRawToObject(cJSON * const object, const char * const name, const char * const raw);
 CJSON_PUBLIC(cJSON*) cJSON_AddObjectToObject(cJSON * const object, const char * const name);
@@ -298,4 +301,3 @@ CJSON_PUBLIC(void) cJSON_free(void *object);
 #endif
 
 #endif
-

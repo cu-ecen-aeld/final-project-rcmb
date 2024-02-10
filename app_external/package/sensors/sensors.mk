@@ -14,7 +14,7 @@ define SENSORS_BUILD_CMDS
 
 define SENSORS_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/sensor_server            $(TARGET_DIR)/usr/bin
-    $(INSTALL) -m 0755 $(@D)/sensor_start_stop.sh        $(TARGET_DIR)/etc/init.d/S99aesdsocket
+    $(INSTALL) -m 0755 $(@D)/sensor_start_stop.sh        $(TARGET_DIR)/etc/init.d/S99sensorsocket
     $(INSTALL) -D -m 0755 $(@D)/sensor_test              $(TARGET_DIR)/usr/bin
     endef
 

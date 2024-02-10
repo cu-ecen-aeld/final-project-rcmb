@@ -117,7 +117,7 @@ CJSON_PUBLIC(double) cJSON_GetNumberValue(const cJSON * const item)
 }
 
 /* This is a safeguard to prevent copy-pasters from using incompatible C and header files */
-#if (CJSON_VERSION_MAJOR != 1) || (CJSON_VERSION_MINOR != 7) || (CJSON_VERSION_PATCH != 17)
+#if (CJSON_VERSION_MAJOR != 1) || (CJSON_VERSION_MINOR != 7) || (CJSON_VERSION_PATCH != 15)
     #error cJSON.h and cJSON.c have different versions. Make sure that both have the same.
 #endif
 
@@ -401,12 +401,7 @@ CJSON_PUBLIC(char*) cJSON_SetValuestring(cJSON *object, const char *valuestring)
 {
     char *copy = NULL;
     /* if object's type is not cJSON_String or is cJSON_IsReference, it should not set valuestring */
-    if ((object == NULL) || !(object->type & cJSON_String) || (object->type & cJSON_IsReference))
-    {
-        return NULL;
-    }
-    /* return NULL if the object is corrupted */
-    if (object->valuestring == NULL)
+    if (!(object->type & cJSON_String) || (object->type & cJSON_IsReference))
     {
         return NULL;
     }
@@ -573,14 +568,20 @@ static cJSON_bool print_number(const cJSON * const item, printbuffer * const out
 	}
     else
     {
-        /* Try 15 decimal places of precision to avoid nonsignificant nonzero digits */
-        length = sprintf((char*)number_buffer, "%1.15g", d);
+        /* If decimal places are present and value is not an integer type */
+        if (item->decimal_places && (ceil(d) != d)) {
+            /* Then convert it to string */
+            length = sprintf((char*) number_buffer, "%.*f", item->decimal_places, d);
+        } else {
+            /* Try 15 decimal places of precision to avoid nonsignificant nonzero digits */
+            length = sprintf((char*)number_buffer, "%1.15g", d);
 
-        /* Check whether the original double can be recovered */
-        if ((sscanf((char*)number_buffer, "%lg", &test) != 1) || !compare_double((double)test, d))
-        {
-            /* If not, print with 17 decimal places of precision */
-            length = sprintf((char*)number_buffer, "%1.17g", d);
+            /* Check whether the original double can be recovered */
+            if ((sscanf((char*)number_buffer, "%lg", &test) != 1) || !compare_double((double)test, d))
+            {
+                /* If not, print with 17 decimal places of precision */
+                length = sprintf((char*)number_buffer, "%1.17g", d);
+            }
         }
     }
 
@@ -2141,6 +2142,28 @@ CJSON_PUBLIC(cJSON*) cJSON_AddNumberToObject(cJSON * const object, const char * 
     return NULL;
 }
 
+CJSON_PUBLIC(cJSON*) cJSON_AddNumberWithPrecisionToObject(cJSON * const object, const char * const name, const double n, int decimal_places)
+{
+    cJSON *number_item;
+
+    if (decimal_places <= 0 || decimal_places > 14)
+    {
+        return NULL;
+    }
+
+    number_item = cJSON_CreateNumber(n);
+
+    number_item->decimal_places = decimal_places;
+
+    if (add_item_to_object(object, name, number_item, &global_hooks, false))
+    {
+        return number_item;
+    }
+
+    cJSON_Delete(number_item);
+    return NULL;
+}
+
 CJSON_PUBLIC(cJSON*) cJSON_AddStringToObject(cJSON * const object, const char * const name, const char * const string)
 {
     cJSON *string_item = cJSON_CreateString(string);
@@ -2269,7 +2292,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_InsertItemInArray(cJSON *array, int which, cJSON 
 {
     cJSON *after_inserted = NULL;
 
-    if (which < 0 || newitem == NULL)
+    if (which < 0)
     {
         return false;
     }
@@ -2278,11 +2301,6 @@ CJSON_PUBLIC(cJSON_bool) cJSON_InsertItemInArray(cJSON *array, int which, cJSON 
     if (after_inserted == NULL)
     {
         return add_item_to_array(array, newitem);
-    }
-
-    if (after_inserted != array->child && after_inserted->prev == NULL) {
-        /* return false if after_inserted is a corrupted array item */
-        return false;
     }
 
     newitem->next = after_inserted;
@@ -2301,7 +2319,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_InsertItemInArray(cJSON *array, int which, cJSON 
 
 CJSON_PUBLIC(cJSON_bool) cJSON_ReplaceItemViaPointer(cJSON * const parent, cJSON * const item, cJSON * replacement)
 {
-    if ((parent == NULL) || (parent->child == NULL) || (replacement == NULL) || (item == NULL))
+    if ((parent == NULL) || (replacement == NULL) || (item == NULL))
     {
         return false;
     }
@@ -3127,4 +3145,3 @@ CJSON_PUBLIC(void) cJSON_free(void *object)
 {
     global_hooks.deallocate(object);
 }
-
