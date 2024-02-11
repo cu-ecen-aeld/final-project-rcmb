@@ -59,7 +59,7 @@ void daemonize() {
 
 void readSensorData(float *temperature, float *pressure) {
     // sensor values
-    syslog(LOG_INFO, "I2C File Descriptor : %i", fd);
+    // syslog(LOG_INFO, "I2C File Descriptor : %i", fd);
     
     *temperature = getTemperatureReading(fd);
     *pressure    = getPressureReading(fd);
